@@ -92,7 +92,8 @@ class RSF {
 	
 	public function show_debug_message() {
 		if($this->request->is_debug) {
-			$t_head = '<table border=1 style="font-size:12px;">';
+			$t_head = '<table border=1 style="font-size:12px; margin-top:20px;">';
+            $t_head.='<tr><td>RSF Debug Message:</td></tr>';
 			foreach($this->debug_list as $str) {
 				$t_head .= '<tr><td>'.$str.'</td></tr>';
 			}
@@ -101,5 +102,19 @@ class RSF {
 			echo $t_head;
 		}
 	}
+    private $pdo_list = array();
+    public function get_pdo($config) {
+        $key = md5($config['db'].$config['host'].$config['port'].$config['user']);
+        if($this->pdo_list[$key]) {
+            return $this->pdo_list[$key];
+        } else {
+            $db_string = 'mysql:host='.$config['host'].';port='.$config['port'].';dbname='.$config['db'];
+            $this->debug($db_string);
+            $pdo  =  new PDO($db_string, $config['user'], $config['pass']);
+            $pdo->exec("SET CHARACTER SET utf8");
+            $this->pdo_list[$key] = $pdo;
+            return $pdo;
+        }
+    }
 }
 ?>
